@@ -1,3 +1,7 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  root to: "shortened_url#list"
+  get "/details/:backhalf", to:"shortened_url#detail"
+  post "url/create", to: "shortened_url#create"
+  get "url/get", to: "shortned_url#get"
+  get "/create", to: "main#create"
 end
