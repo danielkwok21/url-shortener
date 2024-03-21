@@ -2,9 +2,24 @@ require 'rails_helper'
 
 RSpec.describe ShortenedUrlController, type: :controller do
   describe 'get index' do
-    it 'index' do
+    it 'renders data correctly' do
+      # seed data
+      post :create, params: {
+        original_url: 'https://www.google.com', title: 'title', backhalf: 'abc1'
+      }
+      post :create, params: {
+        original_url: 'https://www.youtube.com', title: 'title', backhalf: 'abc2'
+      }
+      post :create, params: {
+        original_url: 'https://www.facebook.com', title: 'title', backhalf: 'abc3'
+      }
+
       get :list
+
+      # assertions
       expect(response).to render_template(:index)
+      expect(assigns(:shortened_urls).length).to eq(3)
+      expect(assigns(:domain_name)).to eq("https://urlshortener.danielkwok.com")
     end
   end
 

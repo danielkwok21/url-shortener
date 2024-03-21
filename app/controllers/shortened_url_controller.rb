@@ -1,5 +1,7 @@
 class ShortenedUrlController < ApplicationController
   def list
+    @shortened_urls = ShortenedUrl.all
+    @domain_name = "https://urlshortener.danielkwok.com"
     render :index
   end
 
