@@ -86,4 +86,39 @@ RSpec.describe ShortenedUrlController, type: :controller do
       end
     end
   end
+
+  describe 'get detail' do
+    context 'happy path' do
+      it 'renders data correctly' do
+        # seed data
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1")
+        puts shortened_url
+        clicks = FactoryBot.create_list(:click, 1, id:1, shortened_url_id: shortened_url.id)
+
+        get :detail, params: {backhalf: 'abc1'}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:clicks)).to eq(clicks)
+        expect(flash[:alert]).to_not be_present
+      end
+    end
+    context 'sad path' do
+      it 'invalid backhalf' do
+        # seed data
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1")
+        puts shortened_url
+        clicks = FactoryBot.create_list(:click, 1, id:1, shortened_url_id: shortened_url.id)
+
+        get :detail, params: {backhalf: 'this is an invalid backhalf'}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(assigns(:shortened_url)).to eq(nil)
+        expect(assigns(:clicks)).to eq(nil)
+        expect(flash[:alert]).to include('Error: invalid backhalf')
+      end
+    end
+  end
 end

@@ -6,7 +6,17 @@ class ShortenedUrlController < ApplicationController
   end
 
   def detail
-    render :detail
+    @shortened_url = ShortenedUrl.find_by(backhalf: params[:backhalf])
+    
+    if @shortened_url != nil
+      @clicks = Click.where(shortened_url_id: @shortened_url.id)
+      @domain_name = "https://urlshortener.danielkwok.com"
+      render :detail
+    else
+      flash[:alert] = 'Error: invalid backhalf'
+      render :detail
+    end
+    
   end
 
   def index
