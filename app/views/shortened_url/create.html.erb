@@ -1,0 +1,49 @@
+<% if @shortened_url.errors.any? %>
+  <div class="alert alert-danger">
+    <ul>
+    <% @shortened_url.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="container">
+  <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+  </nav>
+
+  <h1>Create new</h1>
+    <%= form_with(model:@shortened_url, url:"/create", local:true) do %>
+      <div class="mb-3">
+        <%= label_tag 'original_url', 'Destination', class: 'form-label' %>
+        <%= text_field_tag 'original_url', nil, class: 'form-control', placeholder: 'https://example.com/my-long-url' %>
+      </div>
+      <div class="mb-3">
+        <%= label_tag 'title', 'Title (optional)', class: 'form-label' %>
+        <%= text_field_tag 'title', nil, class: 'form-control', id: 'title', placeholder: 'Example dot com' %>
+      </div>
+      <div class="mb-3">
+        <h2>Ways to share</h2>
+        <div class="d-flex gap-3">
+          <div class="form-group">
+            <%= label_tag 'domain', 'Domain', class: 'form-label' %>
+            <%= text_field_tag 'domain', 'https://mydomain/', class: 'form-control', disabled: true %>
+          </div>
+          <div class="form-group">
+            <%= label_tag 'backhalf', 'Custom backhalf', class: 'form-label' %>
+            <%= text_field_tag 'backhalf', nil, class: 'form-control', id: 'backhalf', maxlength: 15, placeholder: 'supershortcuturl' %>
+             <small id="emailHelp" class="form-text text-muted">Max 15 chars</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-row-reverse gap-2">
+        <%= submit_tag 'Create', class: 'btn btn-primary' %>
+        <%= link_to 'Cancel', '/', class: 'btn btn-outline-secondary' %>
+      </div>
+    <% end %>
+</div>

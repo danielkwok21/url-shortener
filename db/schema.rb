@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_20_004940) do
+ActiveRecord::Schema.define(version: 2024_03_20_112327) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,8 +36,7 @@ ActiveRecord::Schema.define(version: 2024_03_20_004940) do
     t.string "title", limit: 300
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["backhalf"], name: "index_shortened_urls_on_backhalf"
-    t.index ["original_url", "backhalf"], name: "uk_original_url_backhalf", unique: true
+    t.index ["backhalf"], name: "index_shortened_urls_on_backhalf", unique: true
   end
 
   add_foreign_key "clicks", "shortened_urls"
