@@ -11,27 +11,13 @@
   </head>
 
   <body>
-    <%# nav bar %>
-    <nav class="navbar bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">URL shortener</a>
-        <%= link_to url_create_path do %>
-          <button class="btn btn-primary" type="submit">Create</button>
-        <% end %>
-      </div>
-    </nav>
-    
-    <div class="p-5">
-
-      <% if flash[:notice] %>
-        <div class="alert alert-success"><%= flash[:notice] %></div>
-      <% end %>
-
-      <% if flash[:alert] %>
-        <div class="alert alert-danger"><%= flash[:alert] %></div>
-      <% end %>
-
-      <%= yield %>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 text-center mt-5">
+                <h1 class="display-4">404</h1>
+                <p class="lead">Oops! The page you're looking for doesn't exist.</p>
+            </div>
+        </div>
     </div>
   </body>
 </html>
