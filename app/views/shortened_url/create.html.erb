@@ -17,7 +17,7 @@
   </nav>
 
   <h1>Create new</h1>
-    <%= form_with(model:@shortened_url, url:"/create", local:true) do %>
+    <%= form_with(model:@shortened_url, url:url_create_path, local:true) do %>
       <div class="mb-3">
         <%= label_tag 'original_url', 'Destination', class: 'form-label' %>
         <%= text_field_tag 'original_url', nil, class: 'form-control', placeholder: 'https://example.com/my-long-url' %>
