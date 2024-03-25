@@ -1,0 +1,42 @@
+FROM ruby:3.0.6
+
+ENV NODE_VERSION=20.11.0
+ENV NVM_DIR=/root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN . "$NVM_DIR/nvm.sh" \
+    && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" \
+    && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" \
+    && nvm alias default v${NODE_VERSION}
+ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+
+# Install yarn
+RUN npm install -g yarn@1.22
+
+# Default directory
+ENV INSTALL_PATH /opt/app
+RUN mkdir -p $INSTALL_PATH
+
+COPY . $INSTALL_PATH
+
+# Install gems
+WORKDIR $INSTALL_PATH
+RUN ls
+RUN ls ../
+RUN pwd
+RUN rm -rf node_modules vendor
+RUN gem install rails bundler
+RUN bundle install
+RUN yarn install
+
+EXPOSE 3000
+
+ENV NODE_OPTIONS --openssl-legacy-provider
+
+ENTRYPOINT ["/opt/app/docker-entrypoint.sh"]
+
+RUN rails assets:precompile
+
+# Start server
+CMD ["rails", "server", "-b", "0.0.0.0"]

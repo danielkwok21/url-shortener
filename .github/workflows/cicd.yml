@@ -1,0 +1,93 @@
+name: CICD
+on: [push]
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.6
+          bundler-cache: true
+      - name: Run tests
+        run: |
+          bundle install
+          docker-compose -f docker-compose-test.yml up -d
+          sleep 10
+          bundle exec rake db:create RAILS_ENV=test
+          bundle exec rake db:migrate RAILS_ENV=test
+          bundle exec rspec
+
+  build-and-push:
+    needs: tests
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          file: Dockerfile.production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: SSH into server
+        uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: daniel
+          password: ${{ secrets.LINODE_PASSWORD }}
+          port: 22
+          envs: PASSPHRASE
+          script: |
+            cd url_shortener
+
+            # refresh secrets
+            rm .env.production
+            touch.env.production
+            echo "RAILS_ENV=production" >> .env.production
+            echo "RAILS_SERVE_STATIC_FILES=true" >> .env.production
+            echo "DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}" >> .env.production
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env.production
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.production
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.production
+            echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env.production
+            echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env.production
+            echo "SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}" >> .env.production
+
+            # restart server
+            docker-compose -f docker-compose-production.yml down
+            docker-compose -f docker-compose-production.yml rm -f
+            docker-compose -f docker-compose-production.yml pull
+            docker-compose -f docker-compose-production.yml up -d
+
+            sleep 10
+
+            # run migrations, if any
+            docker exec url_shortener rails db:migrate
