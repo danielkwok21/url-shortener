@@ -2,22 +2,33 @@ version: '3.8'
 
 services:
   postgres:
+    container_name: url_shortener_postgres
     image: postgres:latest
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env.production
+    networks:
+      - url_shortener
 
   app:
-    build: 
-      context: .
-      dockerfile: Dockerfile.prd
+    container_name: url_shortener
+    image: ghcr.io/danielkwok21/url-shortener:master_feat_deploy
+    restart: always
     ports:
       - "3000:3000"
     volumes:
       - ./:/opt/app
     env_file:
       - .env.production
+    networks:
+      - url_shortener
 
 volumes:
   postgres_data:
+
+networks:
+  url_shortener:
+    driver: bridge

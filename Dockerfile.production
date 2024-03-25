@@ -18,9 +18,13 @@ RUN npm install -g yarn@1.22
 ENV INSTALL_PATH /opt/app
 RUN mkdir -p $INSTALL_PATH
 
+COPY . $INSTALL_PATH
+
 # Install gems
 WORKDIR $INSTALL_PATH
-COPY . .
+RUN ls
+RUN ls ../
+RUN pwd
 RUN rm -rf node_modules vendor
 RUN gem install rails bundler
 RUN bundle install
@@ -28,6 +32,7 @@ RUN yarn install
 
 EXPOSE 3000
 
+ENV NODE_OPTIONS --openssl-legacy-provider
 
 ENTRYPOINT ["/opt/app/docker-entrypoint.sh"]
 
