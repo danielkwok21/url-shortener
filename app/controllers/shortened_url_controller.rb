@@ -1,22 +1,38 @@
 class ShortenedUrlController < ApplicationController
   def list
-    @shortened_urls = ShortenedUrl.order(created_at: :desc)
-    @domain_name = ENV["DOMAIN_NAME"]
-    render :index
+    user_id = session[:user_id]
+    if user_id
+      @shortened_urls = ShortenedUrl.where(user_id: user_id).order(created_at: :desc)
+      @domain_name = ENV["DOMAIN_NAME"]
+      render :index
+    else
+      redirect_to login_path
+    end
+    
   end
 
   def detail
+    user_id = session[:user_id]
     @shortened_url = ShortenedUrl.find_by(backhalf: params[:backhalf])
     
-    if @shortened_url != nil
-      @clicks = Click.where(shortened_url_id: @shortened_url.id).order(created_at: :desc)
-      @domain_name = ENV["DOMAIN_NAME"]
-      render :detail
-    else
+    if @shortened_url == nil
+      Rails.logger.error "invalid backhalf: #{params[:backhalf]}"
       flash[:alert] = 'Error: invalid backhalf'
       render :detail
+      return
     end
     
+    if @shortened_url.user_id != user_id
+      Rails.logger.error "Shortened URL does not belong to user: #{user_id}"
+      flash[:alert] = 'Error: invalid backhalf'
+      @shortened_url = nil
+      render :detail
+      return
+    end
+    
+    @clicks = Click.where(shortened_url_id: @shortened_url.id).order(created_at: :desc)
+    @domain_name = ENV["DOMAIN_NAME"]
+    render :detail    
   end
 
   def index
@@ -26,7 +42,10 @@ class ShortenedUrlController < ApplicationController
 
   rescue_from PG::UniqueViolation, with: :duplicate_record_error
   def create
+    user_id = session[:user_id]
     @shortened_url = ShortenedUrl.new(create_params)
+    @shortened_url.user_id = user_id
+
     if @shortened_url.save
       redirect_to root_path, notice: "URL registered successfully"
     else
@@ -79,8 +98,7 @@ class ShortenedUrlController < ApplicationController
 
   @private
   def duplicate_record_error
-    # TODO better error handling
-    flash.now[:alert] = 'Error: This record violates a unique constraint.'
+    flash.now[:alert] = 'Backhalf is already taken. Try choosing something more unique?'
     render :create
   end
 

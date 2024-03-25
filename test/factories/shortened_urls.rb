@@ -4,6 +4,7 @@ FactoryBot.define do
     original_url {}
     backhalf {}
     title {}
+    user_id {}
     created_at {Time.now}
     updated_at {Time.now}
   end

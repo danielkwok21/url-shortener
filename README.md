@@ -33,7 +33,7 @@ just merge to `master` branch. pipeline `cicd-yml` would run. Keep in mind
                 rm .env.production
                 touch.env.production
            
-                + echo "<env-key>=<env-value>" >> .env.production
+    +            echo "<env-key>=<env-value>" >> .env.production
                 echo "RAILS_ENV=production" >> .env.production
                 echo "RAILS_SERVE_STATIC_FILES=true" >> .env.production
 
