@@ -9,7 +9,15 @@
     - [Mid priority](#mid-priority)
     - [Low priority](#low-priority)
 ## How to use
+1. Visit https://urlshortener.danielkwok.com/login and login with your provided credentials
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/aa1c74f8-9b7a-4a4f-a970-88de773ae3be)
 
+2. Observe this screen. Click on "Create one now"
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/8594032c-a978-4b40-8ad8-2446689ca334)
+
+3. Fill up details to create your first link
+
+4. 
 
 ## How to run locally
 1. spin up db. this will take awhile if it's the first time)
