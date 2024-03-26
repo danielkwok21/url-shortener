@@ -80,6 +80,7 @@ jobs:
             echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env.production
             echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env.production
             echo "SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}" >> .env.production
+            echo "DEPLOYED_AT=$(date +'%Y-%m-%d %H:%M:%S')" >> .env.production
 
             # restart server
             docker-compose -f docker-compose-production.yml down
