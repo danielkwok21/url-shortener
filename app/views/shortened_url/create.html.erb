@@ -31,7 +31,7 @@
         <div class="d-flex gap-3">
           <div class="form-group">
             <%= label_tag 'domain', 'Domain', class: 'form-label' %>
-            <%= text_field_tag 'domain', 'https://mydomain/', class: 'form-control', disabled: true %>
+            <%= text_field_tag 'domain', @domain_name, class: 'form-control', disabled: true %>
           </div>
           <div class="form-group">
             <%= label_tag 'backhalf', 'Custom backhalf', class: 'form-label' %>
