@@ -37,6 +37,7 @@ class ShortenedUrlController < ApplicationController
 
   def index
     @shortened_url = ShortenedUrl.new
+    @domain_name = ENV["DOMAIN_NAME"]
     render :create
   end
 
