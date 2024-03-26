@@ -16,8 +16,20 @@
 ![image](https://github.com/danielkwok21/url-shortener/assets/28213363/8594032c-a978-4b40-8ad8-2446689ca334)
 
 3. Fill up details to create your first link
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/1faf5fb2-4595-41e6-9fc8-70b22475f633)
 
-4. 
+4. Observe link is created. Click on "Details"
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/0f924469-b66e-4c40-a789-e5cacd5e93ce)
+
+5. Observe zero engagement
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/3dfe2cd3-84fa-4432-94ff-980b9f21aae0)
+
+6. Click on the shortened url. observe it brings you to the original destination  
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/fc976401-0352-479a-bc8a-e147f6613f93)
+
+7. Refresh page, observe that engagement is recorded
+![image](https://github.com/danielkwok21/url-shortener/assets/28213363/a3b89209-a627-4acd-8854-f3ddf00f492a)
+
 
 ## How to run locally
 1. spin up db. this will take awhile if it's the first time)
@@ -94,12 +106,14 @@ For DDOS protection, as the end point `GET /:backhalf` is essentially a non-auth
 2. Caching  
 To reduce db load, as this would be a high read, low write application
 
+3. Edit 
+Ran out of time to build edit functionality
+
 ### Mid priority
 1. Better image tagging  
 Right now, as part of our CICD, all image are published with the name `docker pull ghcr.io/danielkwok21/url-shortener:master`. Ideally these would be tagged according to commits, so we can rollback easily & quickly in production in case something's wrong.
 2. Setup a deploy repo  
 As explained in [PR #7](https://github.com/danielkwok21/url-shortener/pull/7#issue-2204155214), I've made a choice to favour simplicity over thoroughness. These deployment files aren't kept track in git.
-
 
 ### Low priority
 1. Admin panel  
@@ -107,4 +121,4 @@ Right now, there isn't frontend admin view. All user related operations, includi
 2. User auth misc features  
 Forget password, reset password etc
 3. Other features
-QR, custom domain, auto generated backhalf, etc.
+QR, custom domain, auto generated backhalf, aggregated report etc.
