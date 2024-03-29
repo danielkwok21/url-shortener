@@ -170,6 +170,25 @@ RSpec.describe ShortenedUrlController, type: :controller do
         expect(assigns(:clicks)).to eq(nil)
         expect(flash[:alert]).to include('Error: invalid backhalf')
       end
+      it 'if no data, return nothing' do
+        # seed data
+        user = FactoryBot.create(:user, id:1)
+        session[:user_id] = 1
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1", user_id: user.id)
+        
+        get :detail, params: {backhalf: 'abc1'}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(flash.now[:alert]).to eq(nil)
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:number_of_pages)).to eq(0)
+        expect(assigns(:total_count)).to eq(0)
+
+        expect(assigns(:prev_url)).to eq(nil)
+        expect(assigns(:next_url)).to eq(nil)
+        expect(assigns(:clicks)).to eq(nil)
+      end
       it 'if ?page=2, will return 11th to 20th record' do
         # seed data
         user = FactoryBot.create(:user, id:1)

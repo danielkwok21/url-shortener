@@ -14,6 +14,7 @@ class ShortenedUrlController < ApplicationController
   def detail
     user_id = session[:user_id]
     @shortened_url = ShortenedUrl.find_by(backhalf: params[:backhalf])
+    @domain_name = ENV["DOMAIN_NAME"]
     
     if @shortened_url == nil
       Rails.logger.error "invalid backhalf: #{params[:backhalf]}"
@@ -33,6 +34,12 @@ class ShortenedUrlController < ApplicationController
     @total_count = Click.where(shortened_url_id: @shortened_url.id).count
     @page_size = 10
     @number_of_pages = (@total_count.to_f / @page_size).ceil()
+
+    # if no data, just return
+    if @total_count == 0
+      render :detail
+      return
+    end
 
     # if empty query param, fallback to 1
     if params[:page].nil?
@@ -76,7 +83,6 @@ class ShortenedUrlController < ApplicationController
     .limit(@page_size)
     .all
 
-    @domain_name = ENV["DOMAIN_NAME"]
     render :detail    
   end
 
