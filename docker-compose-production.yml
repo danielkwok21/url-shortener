@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_production:/var/lib/postgresql/data
     env_file:
       - .env.production
     networks:
@@ -27,7 +27,7 @@ services:
       - url_shortener
 
 volumes:
-  postgres_data:
+  postgres_data_production:
 
 networks:
   url_shortener:

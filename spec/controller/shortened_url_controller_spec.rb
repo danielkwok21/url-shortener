@@ -139,14 +139,18 @@ RSpec.describe ShortenedUrlController, type: :controller do
       it 'renders data correctly' do
         # seed data
         shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1")
-        clicks = FactoryBot.create_list(:click, 1, id:1, shortened_url_id: shortened_url.id)
+
+        for i in 1..50
+          FactoryBot.create(:click, id:i, shortened_url_id: shortened_url.id)
+        end
 
         get :detail, params: {backhalf: 'abc1'}
 
         # assertions
         expect(response).to render_template(:detail)
         expect(assigns(:shortened_url)).to eq(shortened_url)
-        expect(assigns(:clicks)).to eq(clicks)
+        expect(assigns(:page)).to eq(1)
+        expect(assigns(:clicks).length).to eq(10)
         expect(flash[:alert]).to_not be_present
       end
       it 'should not be able to see another user\'s shortened url\'s details' do
@@ -166,6 +170,78 @@ RSpec.describe ShortenedUrlController, type: :controller do
         expect(assigns(:clicks)).to eq(nil)
         expect(flash[:alert]).to include('Error: invalid backhalf')
       end
+      it 'if ?page=2, will return 11th to 20th record' do
+        # seed data
+        user = FactoryBot.create(:user, id:1)
+        session[:user_id] = 1
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1", user_id: user.id)
+        for i in 1..50
+          FactoryBot.create(:click, id:i, shortened_url_id: shortened_url.id)
+        end
+
+        get :detail, params: {backhalf: 'abc1', page: 2}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(flash.now[:alert]).to eq(nil)
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:number_of_pages)).to eq(5)
+        expect(assigns(:total_count)).to eq(50)
+
+        expect(assigns(:prev_url)).to eq('?page=1')
+        expect(assigns(:next_url)).to eq('?page=3')
+        expect(assigns(:clicks).length).to eq(10)
+        expect(assigns(:clicks).first.id).to eq(40)
+        expect(assigns(:clicks).last.id).to eq(31)
+      end
+      it 'if start of page, prev button is disabled' do
+        # seed data
+        user = FactoryBot.create(:user, id:1)
+        session[:user_id] = 1
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1", user_id: user.id)
+        for i in 1..50
+          FactoryBot.create(:click, id:i, shortened_url_id: shortened_url.id)
+        end
+
+        get :detail, params: {backhalf: 'abc1', page: 1}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(flash.now[:alert]).to eq(nil)
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:number_of_pages)).to eq(5)
+        expect(assigns(:total_count)).to eq(50)
+
+        expect(assigns(:prev_url)).to eq(nil)
+        expect(assigns(:next_url)).to eq('?page=2')
+        expect(assigns(:clicks).length).to eq(10)
+        expect(assigns(:clicks).first.id).to eq(50)
+        expect(assigns(:clicks).last.id).to eq(41)
+      end
+      it 'if end of page, next button is disabled' do
+        # seed data
+        user = FactoryBot.create(:user, id:1)
+        session[:user_id] = 1
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1", user_id: user.id)
+        for i in 1..50
+          FactoryBot.create(:click, id:i, shortened_url_id: shortened_url.id)
+        end
+
+        get :detail, params: {backhalf: 'abc1', page: 5}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(flash.now[:alert]).to eq(nil)
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:number_of_pages)).to eq(5)
+        expect(assigns(:total_count)).to eq(50)
+
+        expect(assigns(:prev_url)).to eq('?page=4')
+        expect(assigns(:next_url)).to eq(nil)
+        expect(assigns(:clicks).length).to eq(10)
+        expect(assigns(:clicks).first.id).to eq(10)
+        expect(assigns(:clicks).last.id).to eq(1)
+      end
     end
     context 'sad path' do
       it 'invalid backhalf' do
@@ -180,6 +256,27 @@ RSpec.describe ShortenedUrlController, type: :controller do
         expect(assigns(:shortened_url)).to eq(nil)
         expect(assigns(:clicks)).to eq(nil)
         expect(flash[:alert]).to include('Error: invalid backhalf')
+      end
+      it 'invalid page number' do
+        # seed data
+        user = FactoryBot.create(:user, id:1)
+        session[:user_id] = 1
+        shortened_url = FactoryBot.create(:shortened_url, id:1, original_url:"https://www.google.com", backhalf:"abc1", user_id: user.id)
+        for i in 1..50
+          FactoryBot.create(:click, id:i, shortened_url_id: shortened_url.id)
+        end
+
+        get :detail, params: {backhalf: 'abc1', page: 500}
+
+        # assertions
+        expect(response).to render_template(:detail)
+        expect(flash.now[:alert]).to eq("Error: invalid page number. <a href=\"http://test.host/details/abc1\"> Click here to go back</a>")
+        expect(assigns(:shortened_url)).to eq(shortened_url)
+        expect(assigns(:number_of_pages)).to eq(0)
+        expect(assigns(:total_count)).to eq(0)
+        expect(assigns(:prev_url)).to eq(nil)
+        expect(assigns(:next_url)).to eq(nil)
+        expect(assigns(:clicks)).to eq(nil)
       end
     end
   end

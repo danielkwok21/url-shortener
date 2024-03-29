@@ -30,7 +30,52 @@ class ShortenedUrlController < ApplicationController
       return
     end
     
-    @clicks = Click.where(shortened_url_id: @shortened_url.id).order(created_at: :desc)
+    @total_count = Click.where(shortened_url_id: @shortened_url.id).count
+    @page_size = 10
+    @number_of_pages = (@total_count.to_f / @page_size).ceil()
+
+    # if empty query param, fallback to 1
+    if params[:page].nil?
+      @page = 1
+    # else, cast it to integer
+    else
+      @page = params[:page].to_i
+    end
+
+    offset = (@page - 1) * @page_size
+
+    # incase out of bound query param
+    is_page_too_small = offset < 0
+    is_page_too_big = @page > @number_of_pages
+    if is_page_too_small || is_page_too_big
+      # obfuscate data
+      @number_of_pages = 0
+      @total_count = 0
+
+      link = "<a href=\"#{request.base_url + request.path}\"> Click here to go back</a>"    
+      flash.now[:alert] = "Error: invalid page number. #{link}".html_safe
+      render :detail
+      return
+    end
+
+    is_at_end = @page == @number_of_pages
+
+    if !is_at_end 
+      @next_url = '?page=' + (@page+1).to_s
+    end
+
+    is_at_beginning = offset == 0
+    if !is_at_beginning 
+      @prev_url = '?page=' + (@page-1).to_s
+    end
+
+
+    @clicks = Click.where(shortened_url_id: @shortened_url.id)
+    .offset(offset)
+    .order(created_at: :desc)
+    .limit(@page_size)
+    .all
+
     @domain_name = ENV["DOMAIN_NAME"]
     render :detail    
   end

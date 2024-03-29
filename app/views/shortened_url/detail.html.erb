@@ -59,10 +59,30 @@
         <div>
           <h5 class="card-title">Engagement</h5>
         </div>
+
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-end">
+            <li class="page-item <%= @prev_url ? '' : 'disabled' %>">
+              <a class="page-link" href=<%= @prev_url %>>Previous</a>
+            </li>
+            <% for i in 1..@number_of_pages %>
+            <li class="page-item">
+              <a class="page-link <%= i == @page ? 'active' : '' %>" href="?page=<%= i %>">
+              <%= i =%>
+              </a>
+            </li>
+            <% end %>
+            <li class="page-item <%= @next_url ? '' : 'disabled' %>">
+              <a class="page-link" href=<%= @next_url ? @next_url : '#' %>>Next</a>
+            </li>
+          </ul>
+        </nav>
+
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
+                <th scope="col">ID</th>
                 <th scope="col">IP address</th>
                 <th scope="col">User agent</th>
                 <th scope="col">Referrer</th>
@@ -74,21 +94,24 @@
                 <th scope="col">Created At</th>
               </tr>
             </thead>
-            <tbody>
-              <% @clicks.each do |click| %>
-              <tr>
-                <td><%=click.ip_address%></td>
-                <td><%=click.user_agent%></td>
-                <td><%=click.referrer%></td>
-                <td><%=click.geolocation%></td>
-                <td><%=click.device_type%></td>
-                <td><%=click.browser%></td>
-                <td><%=click.os%></td>
-                <td><%=click.country%></td>
-                <td><%=click.created_at%></td>
-              </tr>
-              <% end %>
-            </tbody>
+            <% if @clicks.present? %>
+              <tbody>
+                <% @clicks.each do |click| %>
+                <tr>
+                  <td><%=click.id%></td>
+                  <td><%=click.ip_address%></td>
+                  <td><%=click.user_agent%></td>
+                  <td><%=click.referrer%></td>
+                  <td><%=click.geolocation%></td>
+                  <td><%=click.device_type%></td>
+                  <td><%=click.browser%></td>
+                  <td><%=click.os%></td>
+                  <td><%=click.country%></td>
+                  <td><%=click.created_at%></td>
+                </tr>
+                <% end %>
+              </tbody>
+            <% end %>
           </table>
         </div>
       </div>
@@ -99,6 +122,11 @@
 
 
 <script type="text/javascript">
+
+  function onNext(){
+    console.log('hi')
+  }
+
   var copyLinkBtn = document.getElementById('copy-link-btn');
   copyLinkBtn.addEventListener('click', function () {
     var url = copyLinkBtn.getAttribute('data-shortened-url-link');

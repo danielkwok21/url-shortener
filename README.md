@@ -100,16 +100,13 @@ A list of things I would've added in, but have ran out of time to.
 I've sorted these from highest impact, all the way to lowest
 
 ### Highest priority
-1. Pagination for `GET /details/:backhalf` page  
-![image](https://github.com/danielkwok21/url-shortener/assets/28213363/299cd1c2-ed36-435f-8153-d890355b5f3b)
-
-2. Cloudflare  
+1. Cloudflare  
 For DDOS protection, as the end point `GET /:backhalf` is essentially a non-authenticated endpoint anyone can use to run a `SELECT` statement in my postgres db.
 
-3. Caching  
+2. Caching  
 To reduce db load, as this would be a high read, low write application
 
-4. Edit 
+3. Edit 
 Ran out of time to build edit functionality
 
 ### Mid priority
